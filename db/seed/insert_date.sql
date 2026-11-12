@@ -1,5 +1,3 @@
--- seed benzinarii
--- depinde de: db/schema/create_tables.sql.
 
 USE BENZINARII;
 
@@ -26,13 +24,13 @@ INSERT INTO FURNIZOR (id_furnizor, denumire, cui, telefon, email, localitate, ju
 (2, 'Petrom Solutions', 'RO22222222', '0217778888', 'office@petrom.ro', 'Bucuresti', 'Sector 2', 'Strada Libertatii', '50', TRUE);
 
 -- --- angajat (admin + casieri/manager) ---
--- admin: id_statie null, parola "admin".
+-- parole simple, hash-uite cu SHA-256 in aplicatie (clasa PasswordHasher).
 INSERT INTO ANGAJAT (id_angajat, id_statie, functie, nume, prenume, cnp, telefon, email, data_angajare, utilizator, parola_hash, activ) VALUES
-(1, NULL, 'admin', 'Croitoru', 'Cristian', '1900101123456', '0722111222', 'cristian.croitoru@benzinarie.ro', '2020-01-01', 'admin', '$2a$12$tzMay09CjWaSRl9bbMkfDe/sF.r4DWID3Uyo/rsvMMXA6dGFqoWmG', TRUE),
-(2, 1, 'casier', 'Popescu', 'Ion', '1800201123457', '0733111223', 'ion.popescu@benzinarie.ro', '2021-03-15', 'ipopescu', '$2a$12$dummyhashfortesting00000000000', TRUE),
-(3, 2, 'manager', 'Ionescu', 'Maria', '1820301123458', '0733222334', 'maria.ionescu@benzinarie.ro', '2020-06-10', 'mionescu', '$2a$12$dummyhashfortesting00000000000', TRUE),
-(4, 3, 'casier', 'Stan', 'Andrei', '1910401123459', '0733333445', 'andrei.stan@benzinarie.ro', '2022-01-20', 'astan', '$2a$12$dummyhashfortesting00000000000', TRUE),
-(5, 4, 'casier', 'Voicu', 'Elena', '1950501123460', '0733444556', 'elena.voicu@benzinarie.ro', '2022-05-05', 'evoicu', '$2a$12$dummyhashfortesting00000000000', TRUE);
+(1, NULL, 'admin', 'Croitoru', 'Cristian', '1900101123456', '0722111222', 'cristian.croitoru@benzinarie.ro', '2020-01-01', 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', TRUE),
+(2, 1, 'casier', 'Popescu', 'Ion', '1800201123457', '0733111223', 'ion.popescu@benzinarie.ro', '2021-03-15', 'ipopescu', 'a3a2754f94b4f8c1ca8d29290bc37ba90cedf0e13a9e702a829740835e5ed564', TRUE),
+(3, 2, 'manager', 'Ionescu', 'Maria', '1820301123458', '0733222334', 'maria.ionescu@benzinarie.ro', '2020-06-10', 'mionescu', 'a3a2754f94b4f8c1ca8d29290bc37ba90cedf0e13a9e702a829740835e5ed564', TRUE),
+(4, 3, 'casier', 'Stan', 'Andrei', '1910401123459', '0733333445', 'andrei.stan@benzinarie.ro', '2022-01-20', 'astan', 'a3a2754f94b4f8c1ca8d29290bc37ba90cedf0e13a9e702a829740835e5ed564', TRUE),
+(5, 4, 'casier', 'Voicu', 'Elena', '1950501123460', '0733444556', 'elena.voicu@benzinarie.ro', '2022-05-05', 'evoicu', 'a3a2754f94b4f8c1ca8d29290bc37ba90cedf0e13a9e702a829740835e5ed564', TRUE);
 
 -- --- pret_carburant (istoric, rand cu data_sfarsit null = curent) ---
 INSERT INTO PRET_CARBURANT (id_pret, id_statie, id_tip_carburant, pret, data_inceput, data_sfarsit) VALUES
@@ -59,8 +57,7 @@ INSERT INTO PRET_EV (id_pret_ev, id_statie, cost_kwh, adaos_procent, tva_procent
 (4, 3, 1.90, 8.00, 19.00, 2.42, '2025-10-01', NULL),
 (5, 4, 1.85, 11.00, 19.00, 2.40, '2025-10-01', NULL);
 
--- --- rezervor (2 per statie = 8). stoc_curent setat manual pentru a corespunde cu livrari/alimentari. ---
--- rezervoare sub nivel minim: r3 (stoc 1100 < minim 1500), r6 (stoc 700 < minim 1000)
+-- --- rezervor (2 per statie = 8) ---
 INSERT INTO REZERVOR (id_rezervor, id_statie, id_tip_carburant, numar, capacitate_max, stoc_curent, nivel_minim) VALUES
 (1, 1, 1, 1, 15000.000, 5200.000, 2000.000),
 (2, 1, 2, 2, 12000.000, 3100.000, 1500.000),
@@ -82,28 +79,20 @@ INSERT INTO POMPA (id_pompa, id_statie, numar, activ) VALUES
 (7, 4, 1, TRUE),
 (8, 4, 2, TRUE);
 
--- --- duza (2-3 per pompa), fiecare trage dintr-un rezervor ---
+-- --- duza (2-3 per pompa) ---
 INSERT INTO DUZA (id_duza, id_pompa, id_rezervor, numar, activ) VALUES
--- pompa 1 (statie 1) -> rezervor 1 (benzina)
 (1, 1, 1, 1, TRUE),
 (2, 1, 1, 2, TRUE),
--- pompa 2 (statie 1) -> rezervor 2 (motorina)
 (3, 2, 2, 1, TRUE),
 (4, 2, 2, 2, TRUE),
--- pompa 3 (statie 2) -> rezervor 3 (benzina)
 (5, 3, 3, 1, TRUE),
 (6, 3, 3, 2, TRUE),
--- pompa 4 (statie 2) -> rezervor 4 (motorina)
 (7, 4, 4, 1, TRUE),
--- pompa 5 (statie 3) -> rezervor 5 (benzina)
 (8, 5, 5, 1, TRUE),
 (9, 5, 5, 2, TRUE),
--- pompa 6 (statie 3) -> rezervor 6 (motorina)
 (10, 6, 6, 1, TRUE),
--- pompa 7 (statie 4) -> rezervor 7 (benzina)
 (11, 7, 7, 1, TRUE),
 (12, 7, 7, 2, TRUE),
--- pompa 8 (statie 4) -> rezervor 8 (motorina)
 (13, 8, 8, 1, TRUE);
 
 -- --- statie_ev (1-2 per statie) ---
@@ -139,11 +128,11 @@ INSERT INTO COMANDA (id_comanda, id_statie, id_angajat, id_furnizor, data_comand
 
 -- --- linie_comanda ---
 INSERT INTO LINIE_COMANDA (id_linie_comanda, id_comanda, id_tip_carburant, cantitate_comandata) VALUES
-(1, 1, 1, 5000.000),  -- C1 benzina 5000
-(2, 1, 2, 3000.000),  -- C1 motorina 3000
-(3, 2, 1, 2000.000),  -- C2 benzina 2000 (partial livrata)
-(4, 3, 1, 4000.000),  -- C3 benzina 4000 (fara livrare)
-(5, 4, 2, 2500.000);  -- C4 motorina 2500 (anulata)
+(1, 1, 1, 5000.000),
+(2, 1, 2, 3000.000),
+(3, 2, 1, 2000.000),
+(4, 3, 1, 4000.000),
+(5, 4, 2, 2500.000);
 
 -- --- livrare ---
 INSERT INTO LIVRARE (id_livrare, id_comanda, data_livrare, nr_aviz, nr_factura) VALUES
@@ -151,12 +140,12 @@ INSERT INTO LIVRARE (id_livrare, id_comanda, data_livrare, nr_aviz, nr_factura) 
 (2, 1, '2025-09-14', 'AV-1002', 'F-2002'),
 (3, 2, '2025-09-18', 'AV-1003', 'F-2003');
 
--- --- linie_livrare (cresc stocul rezervoarelor) ---
+-- --- linie_livrare ---
 INSERT INTO LINIE_LIVRARE (id_linie_livrare, id_livrare, id_linie_comanda, id_rezervor, cantitate_primita, pret_achizitie) VALUES
-(1, 1, 1, 1, 3000.000, 5.20),  -- L1 in R1 (benzina st1)
-(2, 2, 1, 1, 2000.000, 5.20),  -- L2 in R1 (benzina st1) -> total 5000 = comandata
-(3, 2, 2, 2, 3000.000, 4.90),  -- L2 in R2 (motorina st1) -> total 3000 = comandata
-(4, 3, 3, 3, 1000.000, 5.25);  -- L3 in R3 (benzina st2) -> partial 1000/2000
+(1, 1, 1, 1, 3000.000, 5.20),
+(2, 2, 1, 1, 2000.000, 5.20),
+(3, 2, 2, 2, 3000.000, 4.90),
+(4, 3, 3, 3, 1000.000, 5.25);
 
 -- --- bon (valid / anulat, numar_bon unic pe statie) ---
 INSERT INTO BON (id_bon, id_statie, id_angajat, numar_bon, data_ora, stare) VALUES
@@ -167,31 +156,31 @@ INSERT INTO BON (id_bon, id_statie, id_angajat, numar_bon, data_ora, stare) VALU
 
 -- --- alimentare (id_bon null = neplatita) ---
 INSERT INTO ALIMENTARE (id_alimentare, id_duza, id_tip_carburant, id_bon, data_ora, litri, pret_litru, tva_procent) VALUES
-(1, 1, 1, 1, '2025-10-05 08:35:00', 35.500, 6.45, 19.00),  -- platita pe B1
-(2, 3, 2, 1, '2025-10-05 08:40:00', 25.000, 6.10, 19.00),  -- platita pe B1
-(3, 5, 1, NULL, '2025-10-06 09:00:00', 40.000, 6.50, 19.00),  -- neplatita -> incident INC1
-(4, 2, 1, 2, '2025-10-05 09:20:00', 20.000, 6.45, 19.00),  -- pe bon anulat B2
-(5, 8, 1, 3, '2025-10-06 10:05:00', 30.000, 6.40, 19.00),  -- platita pe B3
-(6, 10, 2, NULL, '2025-10-07 11:05:00', 15.000, 6.05, 19.00),  -- neplatita -> incident INC3
-(7, 11, 1, 4, '2025-10-07 11:15:00', 45.000, 6.55, 19.00),  -- platita pe B4
-(8, 13, 2, NULL, '2025-10-08 12:00:00', 12.000, 6.20, 19.00);  -- neplatita
+(1, 1, 1, 1, '2025-10-05 08:35:00', 35.500, 6.45, 19.00),
+(2, 3, 2, 1, '2025-10-05 08:40:00', 25.000, 6.10, 19.00),
+(3, 5, 1, NULL, '2025-10-06 09:00:00', 40.000, 6.50, 19.00),
+(4, 2, 1, 2, '2025-10-05 09:20:00', 20.000, 6.45, 19.00),
+(5, 8, 1, 3, '2025-10-06 10:05:00', 30.000, 6.40, 19.00),
+(6, 10, 2, NULL, '2025-10-07 11:05:00', 15.000, 6.05, 19.00),
+(7, 11, 1, 4, '2025-10-07 11:15:00', 45.000, 6.55, 19.00),
+(8, 13, 2, NULL, '2025-10-08 12:00:00', 12.000, 6.20, 19.00);
 
 -- --- incarcare_ev (id_bon null = neplatita) ---
 INSERT INTO INCARCARE_EV (id_incarcare, id_conector, id_bon, data_ora_start, data_ora_sfarsit, kwh, pret_kwh, tva_procent) VALUES
-(1, 1, 1, '2025-10-05 08:45:00', '2025-10-05 09:00:00', 25.000, 2.36, 19.00),  -- platita pe B1
-(2, 3, NULL, '2025-10-06 10:30:00', NULL, 18.000, 2.28, 19.00),  -- neplatita, in curs -> incident INC2
-(3, 5, 3, '2025-10-06 11:00:00', '2025-10-06 11:30:00', 22.000, 2.42, 19.00),  -- platita pe B3
-(4, 7, 4, '2025-10-07 11:30:00', '2025-10-07 11:50:00', 30.000, 2.40, 19.00),  -- platita pe B4
-(5, 9, NULL, '2025-10-08 12:30:00', NULL, 10.000, 2.40, 19.00);  -- neplatita
+(1, 1, 1, '2025-10-05 08:45:00', '2025-10-05 09:00:00', 25.000, 2.36, 19.00),
+(2, 3, NULL, '2025-10-06 10:30:00', NULL, 18.000, 2.28, 19.00),
+(3, 5, 3, '2025-10-06 11:00:00', '2025-10-06 11:30:00', 22.000, 2.42, 19.00),
+(4, 7, 4, '2025-10-07 11:30:00', '2025-10-07 11:50:00', 30.000, 2.40, 19.00),
+(5, 9, NULL, '2025-10-08 12:30:00', NULL, 10.000, 2.40, 19.00);
 
--- --- tranzactie (suma metodelor = totalul bonului valid) ---
+-- --- tranzactie ---
 INSERT INTO TRANZACTIE (id_tranzactie, id_bon, metoda, suma) VALUES
 (1, 1, 'numerar', 200.00),
 (2, 1, 'card', 240.48),
 (3, 3, 'card', 245.24),
 (4, 4, 'numerar', 294.75);
 
--- --- incident_neplata (exact unul dintre id_alimentare / id_incarcare) ---
+-- --- incident_neplata ---
 INSERT INTO INCIDENT_NEPLATA (id_incident, id_alimentare, id_incarcare, id_angajat, nr_inmatriculare, descriere, data_ora, stare) VALUES
 (1, 3, NULL, 3, 'B 123 XYZ', 'Clientul a parsat si nu a platit alimentarea la duza 5.', '2025-10-06 09:30:00', 'deschis'),
 (2, NULL, 2, 3, 'C 456 ABC', 'Incarcare EV neplatita, masina a parsat de la conectorul 3.', '2025-10-06 11:00:00', 'anuntata politia'),
